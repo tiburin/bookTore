@@ -1,9 +1,21 @@
 #![feature(int_roundings)]
 use indexmap::IndexMap;
+use std::collections::HashSet;
+
 use std::{self, fs};
 static SENTENCE_START: isize = 3;
 static SENTENCE_END: usize = 9;
 static TAKE: usize = 3;
+const SPANISH: bool = false;
+
+fn get_spanish(letter: char) -> bool {
+    let mut store = HashSet::new();
+    "ñáíéóúü".chars().for_each(|n| {
+        store.insert(n);
+    });
+    store.contains(&letter)
+}
+
 struct English;
 impl English {
     fn start() -> i32 {
@@ -13,12 +25,20 @@ impl English {
         122
     }
 
-    fn is_range(value: i32) -> bool {
-        value >= English::start() && value <= English::end()
+    fn is_range(letter: char) -> bool {
+        let value = letter as i32;
+        let is_english = value >= English::start() && value <= English::end();
+
+        if SPANISH {
+            is_english || get_spanish(letter)
+        } else {
+            is_english
+        }
     }
+
     fn valid_english(input: &str) -> bool {
         for letter in input.chars() {
-            if !English::is_range(letter as i32) {
+            if !English::is_range(letter) {
                 return false;
             }
         }
@@ -32,7 +52,7 @@ impl Str {
         let mut list = input.chars();
         let mut current = list.next();
         while let Some(letter) = current {
-            if !English::is_range(letter as i32) {
+            if !English::is_range(letter) {
                 start += letter.len_utf8();
             } else {
                 return &input[start..input.len()];
@@ -46,7 +66,7 @@ impl Str {
         let mut list = input.chars();
         let mut current = list.next_back();
         while let Some(letter) = current {
-            if !English::is_range(letter as i32) {
+            if !English::is_range(letter) {
                 end -= letter.len_utf8();
             } else {
                 return &input[0..end];
