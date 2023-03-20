@@ -1,4 +1,3 @@
-#![feature(int_roundings)]
 use indexmap::IndexMap;
 use std::collections::HashSet;
 
